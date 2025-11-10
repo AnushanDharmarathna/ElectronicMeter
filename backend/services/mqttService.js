@@ -1,8 +1,8 @@
 // backend/services/mqttService.js
 const mqtt = require("mqtt");
 
-const MQTT_BROKER = "mqtt://47.104.81.55:1883";
-const MQTT_TOPIC = "MINI-02-CF52/test001/device_to_app";
+const MQTT_BROKER = "mqtt://124.43.65.197:1884";
+const MQTT_TOPIC = "RCS2/DEVICE/PowerMonitor";
 
 class MqttService {
   constructor() {
