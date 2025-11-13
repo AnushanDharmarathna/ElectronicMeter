@@ -1,10 +1,32 @@
 // backend/routes/influxRoutes.js
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const { writeApi, queryApi, Point } = require('../config/influxService');
 
 const router = express.Router();
 
-//Push Sensor Data
+// Authentication middleware
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key', (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: 'Invalid or expired token' });
+    }
+    req.user = user;
+    next();
+  });
+};
+
+// Apply authentication to all routes
+router.use(authenticateToken);
+
+// Push Sensor Data
 router.post('/push', async (req, res) => {
   const {
     sensor_id,
@@ -74,7 +96,7 @@ router.post('/push', async (req, res) => {
   }
 });
 
-//Get Sensor Data
+// Get Sensor Data
 router.get('/:device_sn/:measurement/:sensorId/:hours', async (req, res) => {
   const { device_sn, measurement, sensorId, hours: hoursParam } = req.params;
   const hours = parseInt(hoursParam, 10);
