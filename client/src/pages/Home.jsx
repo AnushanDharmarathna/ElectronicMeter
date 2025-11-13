@@ -30,7 +30,7 @@ const Home = () => {
         <div className="flex justify-between w-full h-full">
           <div className="w-1/2 h-full rounded-l-2xl p-10 flex justify-center flex-col">
             <div className="flex justify-center mb-10">
-              <p className="font-semibold text-xl">Beacon Tracker Login</p>
+              <p className="font-semibold text-xl">Electronic Meter Login</p>
             </div>
 
             <Form 
