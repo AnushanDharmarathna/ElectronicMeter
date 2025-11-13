@@ -9,6 +9,9 @@ const authRoutes = require('./routes/authRoutes');
 const mqttService = require('./services/mqttService');
 const mqttRoutes = require('./routes/mqttRoutes');
 
+// === NEW: InfluxDB ===
+const influxRoutes = require('./routes/influxRoutes');
+
 dotenv.config();
 const app = express();
 
@@ -24,6 +27,7 @@ app.use('/uploads', express.static(path.join(__dirname, process.env.UPLOADS_DIR)
 // Mount routes
 app.use('/api', authRoutes);           // ← existing
 app.use('/api/mqtt', mqttRoutes);      // ← NEW: SSE endpoint
+app.use('/api/influx', influxRoutes);
 
 // === NEW: Start MQTT → SSE bridge ===
 mqttService.start();
@@ -32,4 +36,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`SSE stream: http://localhost:${PORT}/api/mqtt/events`);
+  console.log(`Influx push: POST http://localhost:${PORT}/api/influx/push`);
+  console.log(`Influx query: GET http://localhost:${PORT}/api/influx/temperature`);
 });
