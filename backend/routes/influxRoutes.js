@@ -113,6 +113,7 @@ router.get('/:device_sn/:measurement/:sensorId/:hours', async (req, res) => {
       |> filter(fn: (r) => r._measurement == "${measurement}")
       |> filter(fn: (r) => r._field == "value")
       |> filter(fn: (r) => r.sensor_id == "${sensorId}")
+      |> timeShift(duration: 5h30m, columns: ["_time"])
   `;
 
   const result = [];
