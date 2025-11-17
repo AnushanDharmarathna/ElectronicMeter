@@ -19,8 +19,8 @@ const AvatarButton = () => {
               src: BgItems.AvaterIcon,
             }}
             className="transition-transform"
-            description={`@${user?.username || 'user'}`}
-            name={'Superadmin'}
+            description={`@${user?.role || 'user'}`}
+            name={`${user?.username || 'user'}`}
           />
         </DropdownTrigger>
         <DropdownMenu aria-label="User Actions" variant="flat">
