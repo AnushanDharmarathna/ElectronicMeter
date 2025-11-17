@@ -4,95 +4,88 @@ import { useNavigate, useLocation } from 'react-router-dom';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token') || null);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
+  const API = 'http://localhost:5000/api';
+
+  // Load token from sessionStorage on first render (persists across refresh)
+  const [token, setToken] = useState(() => sessionStorage.getItem('token') || null);
+  const [user, setUser] = useState(() => {
+    const saved = sessionStorage.getItem('user');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const [loading, setLoading] = useState(true);
+
+  /* --------------------------------------------------------------
+     Verify token on first load
+  -------------------------------------------------------------- */
   useEffect(() => {
-    const verifyToken = async () => {
-      const storedToken = localStorage.getItem('token');
-      const storedUser = localStorage.getItem('user');
+    const verify = async () => {
+      if (!token) {
+        setLoading(false);
+        return navigate('/home', { replace: true });
+      }
 
-      if (storedToken && storedUser) {
-        try {
-          const response = await fetch('http://localhost:5000/api/protected', {
-            headers: {
-              Authorization: `Bearer ${storedToken}`,
-            },
-          });
-          if (response.ok) {
-            setUser(JSON.parse(storedUser));
-            setToken(storedToken);
-            if (location.pathname === '/home' || location.pathname === '/') {
-              navigate('/dashboard', { replace: true });
-            }
-          } else {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            setUser(null);
-            setToken(null);
-            navigate('/home', { replace: true });
-          }
-        } catch (error) {
-          console.error('Token verification failed:', error);
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          setUser(null);
+      try {
+        const res = await fetch(`${API}/protected`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          sessionStorage.clear();
           setToken(null);
-          navigate('/home', { replace: true });
+          setUser(null);
+          return navigate('/home', { replace: true });
         }
-      } else {
-        setUser(null);
+
+        if (location.pathname === '/' || location.pathname === '/home') {
+          navigate('/dashboard', { replace: true });
+        }
+      } catch (err) {
+        sessionStorage.clear();
         setToken(null);
-        if (location.pathname !== '/home') {
-          navigate('/home', { replace: true });
-        }
-      }
-      setLoading(false);
-    };
-
-    verifyToken();
-
-    // Prevent back navigation to /home
-    const handlePopState = () => {
-      if (user && (location.pathname === '/home' || location.pathname === '/')) {
-        navigate('/dashboard', { replace: true });
+        setUser(null);
+        navigate('/home', { replace: true });
+      } finally {
+        setLoading(false);
       }
     };
 
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [navigate, location.pathname, user]);
+    verify();
+  }, []);
 
+  /* --------------------------------------------------------------
+     Login
+  -------------------------------------------------------------- */
   const login = async (username, password) => {
-    try {
-      const response = await fetch('http://localhost:5000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setToken(data.token);
-        setUser(data.user);
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        navigate('/dashboard', { replace: true });
-      } else {
-        throw new Error(data.error || 'Login failed');
-      }
-    } catch (error) {
-      throw error;
-    }
+    const res = await fetch(`${API}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+
+    // Save to sessionStorage
+    sessionStorage.setItem('token', data.token);
+    sessionStorage.setItem('user', JSON.stringify(data.user));
+
+    setToken(data.token);
+    setUser(data.user);
+
+    navigate('/dashboard', { replace: true });
   };
 
+  /* --------------------------------------------------------------
+     Logout
+  -------------------------------------------------------------- */
   const logout = () => {
+    sessionStorage.clear();
     setToken(null);
     setUser(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
     navigate('/home', { replace: true });
   };
 

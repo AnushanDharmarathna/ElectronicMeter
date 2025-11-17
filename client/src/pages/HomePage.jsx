@@ -1,10 +1,11 @@
-import React from 'react'
+import React, {useContext} from 'react'
 import MqttConnection from '../components/mqtt/MqttConnection'
 
 const HomePage = () => {
+
   return (
     <div className='pt-[70px] w-full h-full'>
-        <MqttConnection/>
+      <MqttConnection/>
     </div>
   )
 }
