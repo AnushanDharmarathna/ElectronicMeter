@@ -8,9 +8,6 @@ const AvatarButton = () => {
   const { logout, user } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  console.log(user);
-  
-
   return (
     <div className="flex items-center gap-4">
       <Dropdown placement="bottom-start">
@@ -22,8 +19,8 @@ const AvatarButton = () => {
               src: BgItems.AvaterIcon,
             }}
             className="transition-transform"
-            description={`@${user?.username || 'user'}`}
-            name={'Superadmin'}
+            description={`@${user?.role || 'user'}`}
+            name={`${user?.username || 'user'}`}
           />
         </DropdownTrigger>
         <DropdownMenu aria-label="User Actions" variant="flat">
