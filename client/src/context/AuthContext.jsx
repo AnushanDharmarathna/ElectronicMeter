@@ -9,12 +9,13 @@ export const AuthProvider = ({ children }) => {
 
   const API = 'http://localhost:5000/api';
 
-  // Load token from sessionStorage on first render (persists across refresh)
-  const [token, setToken] = useState(() => sessionStorage.getItem('token') || null);
+  // Load stored data (id, username, role)
   const [user, setUser] = useState(() => {
     const saved = sessionStorage.getItem('user');
-    return saved ? JSON.parse(saved) : null;
+    return saved ? JSON.parse(saved) : null; // { id, username, role }
   });
+
+  const [token, setToken] = useState(() => sessionStorage.getItem('token') || null);
 
   const [loading, setLoading] = useState(true);
 
@@ -69,12 +70,20 @@ export const AuthProvider = ({ children }) => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
 
+    // Extract id, username, role from backend response
+    const userObject = {
+      id: data.user.id,
+      username: data.user.username,
+      role: data.user.role,
+    };
+
     // Save to sessionStorage
     sessionStorage.setItem('token', data.token);
-    sessionStorage.setItem('user', JSON.stringify(data.user));
+    sessionStorage.setItem('user', JSON.stringify(userObject));
 
+    // Save to React state
     setToken(data.token);
-    setUser(data.user);
+    setUser(userObject);
 
     navigate('/dashboard', { replace: true });
   };

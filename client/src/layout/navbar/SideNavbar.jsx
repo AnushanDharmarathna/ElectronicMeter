@@ -1,14 +1,23 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import HomePage from '../../pages/HomePage';
+import { AuthContext } from '../../context/AuthContext';
 
 const SideNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState('Home');
 
+  const { user } = useContext(AuthContext);
+
+  const isSuperadmin = user?.role === 'superadmin';
+  const isAdmin = user?.role === 'admin';
+  const isUser = user?.role === 'user';
+
   const pages = {
-    'Home': <div className="h-full"><HomePage/></div>,
-    // 'Products': <div className="h-full">Content for Page 2</div>,
-    // 'Solutions': <div className="h-full">Content for Page 3</div>,
+    ...(isSuperadmin ? { 'Home': <div className="h-full"><HomePage/></div> } : {}),
+
+    ...(isAdmin ? { 'Home': <div className="h-full"><HomePage/></div> } : {}),
+
+    ...(isUser ? { 'Home': <div className="h-full"><HomePage/></div> } : {}),
   };
 
   const toggleMenu = () => {

@@ -8,6 +8,9 @@ const AvatarButton = () => {
   const { logout, user } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  console.log(user);
+  
+
   return (
     <div className="flex items-center gap-4">
       <Dropdown placement="bottom-start">
