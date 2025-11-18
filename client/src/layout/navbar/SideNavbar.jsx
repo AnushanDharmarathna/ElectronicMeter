@@ -32,7 +32,7 @@ const SideNavbar = () => {
   const basePages = {
     ...(isSuperadmin ? { 'Home': <div className="h-full"><HomePage setDisplayContent={setDisplayContent} /></div>  } : {}),
     ...(isAdmin ? { 'AdminHome': <div className="h-full"><AdminHome setDisplayContent={setDisplayContent} /></div>  } : {}),
-    ...(isUser ? { 'AdminHome': <div className="h-full"><UserHome setDisplayContent={setDisplayContent} /></div>  } : {}),
+    ...(isUser ? { 'UserHome': <div className="h-full"><UserHome setDisplayContent={setDisplayContent} /></div>  } : {}),
   };
 
   // Only show in sidebar if user has access

@@ -49,7 +49,9 @@ router.post('/login', async (req, res) => {
       const userData = { 
         id: user.id, 
         username: user.username, 
-        role: user.role 
+        role: user.role,
+        company: user.company,
+        branch: user.branch
       };
 
       const token = jwt.sign(userData, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -114,7 +116,9 @@ router.put('/change-username', authenticateToken, async (req, res) => {
           const userData = { 
             id: req.user.id, 
             username: newUsername, 
-            role: req.user.role 
+            role: req.user.role,
+            company: req.user.company,
+            branch: req.user.branch
           };
 
           const newToken = jwt.sign(userData, process.env.JWT_SECRET, { expiresIn: '1h' });

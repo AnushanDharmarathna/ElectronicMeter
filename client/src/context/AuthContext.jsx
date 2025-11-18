@@ -75,6 +75,8 @@ export const AuthProvider = ({ children }) => {
       id: data.user.id,
       username: data.user.username,
       role: data.user.role,
+      company: data.user.company,
+      branch: data.user.branch
     };
 
     // Save to sessionStorage
